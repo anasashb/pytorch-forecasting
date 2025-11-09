@@ -35,23 +35,23 @@ class FullAttention(nn.Module):
         factor (int): Factor for scaling the attention scores.
         scale (float): Scaling factor for attention scores.
         attention_dropout (float): Dropout rate for attention scores.
-        output_attention (bool): Whether to output attention weights."""
+        output_attention (bool): Whether to output attention weights.
+    """
 
     def __init__(
         self,
         mask_flag=True,
-        factor=5,
         scale=None,
         attention_dropout=0.1,
         output_attention=False,
-    ):
+    ) -> None:
         super().__init__()
         self.scale = scale
         self.mask_flag = mask_flag
         self.output_attention = output_attention
         self.dropout = nn.Dropout(attention_dropout)
 
-    def forward(self, queries, keys, values, attn_mask, tau=None, delta=None):
+    def forward(self, queries, keys, values, attn_mask):
         B, L, H, E = queries.shape
         _, S, _, D = values.shape
         scale = self.scale or 1.0 / sqrt(E)

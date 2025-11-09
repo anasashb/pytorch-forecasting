@@ -45,18 +45,19 @@ class EncoderLayer(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.activation = F.relu if activation == "relu" else F.gelu
 
-    def forward(self, x, cross, x_mask=None, cross_mask=None, tau=None, delta=None):
+    def forward(self, x, cross, x_mask=None, cross_mask=None):
         B, L, D = cross.shape
-        x = x + self.dropout(
-            self.self_attention(x, x, x, attn_mask=x_mask, tau=tau, delta=None)[0]
-        )
+        x = x + self.dropout(self.self_attention(x, x, x, attn_mask=x_mask)[0])
         x = self.norm1(x)
 
         x_glb_ori = x[:, -1, :].unsqueeze(1)
         x_glb = torch.reshape(x_glb_ori, (B, -1, D))
         x_glb_attn = self.dropout(
             self.cross_attention(
-                x_glb, cross, cross, attn_mask=cross_mask, tau=tau, delta=delta
+                x_glb,
+                cross,
+                cross,
+                attn_mask=cross_mask,
             )[0]
         )
         x_glb_attn = torch.reshape(
